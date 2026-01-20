@@ -20,6 +20,6 @@ cask "superset" do
 
   zap trash: [
     "~/Library/Application Support/Superset",
-    "~/Library/Preferences/com.superset.app.plist",
+    "~/Library/Preferences/com.superset.desktop.plist",
   ]
 end

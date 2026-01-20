@@ -22,6 +22,6 @@ cask "1code" do
 
   zap trash: [
     "~/Library/Application Support/1Code",
-    "~/Library/Preferences/com.21st.1code.plist",
+    "~/Library/Preferences/dev.21st.agents.plist",
   ]
 end

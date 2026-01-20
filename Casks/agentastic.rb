@@ -18,7 +18,10 @@ cask "agentastic" do
   app "Agentastic.dev.app"
 
   zap trash: [
+    "~/Library/Application Scripts/dev.agentastic.Agentastic.OpenWithCodeEdit",
     "~/Library/Application Support/Agentastic.dev",
-    "~/Library/Preferences/com.agentastic.dev.plist",
+    "~/Library/Containers/dev.agentastic.Agentastic.OpenWithCodeEdit",
+    "~/Library/Group Containers/dev.agentastic.Agentastic.shared",
+    "~/Library/Preferences/dev.agentastic.Agentastic.plist",
   ]
 end
