@@ -1,4 +1,4 @@
-name: Auto-bump Casks
+name: Auto-bump Casks and Formulas
 
 on:
   schedule:
@@ -7,6 +7,9 @@ on:
     inputs:
       cask:
         description: "Cask to bump (leave empty for all)"
+        required: false
+      formula:
+        description: "Formula to bump (leave empty for all)"
         required: false
 
 jobs:
@@ -28,6 +31,7 @@ jobs:
           # Install tap
           brew tap ${{ github.repository }}
 
+          # Bump casks
           if [[ -n "${{ inputs.cask }}" ]]; then
             brew livecheck --cask "${{ inputs.cask }}" --newer-only && \
               brew bump-cask-pr "${{ inputs.cask }}" --no-browse --no-fork || true
@@ -35,8 +39,24 @@ jobs:
             # Check all casks in this tap
             for cask in Casks/*.rb; do
               name=$(basename "$cask" .rb)
-              echo "Checking $name..."
+              echo "Checking cask $name..."
               brew livecheck --cask "$name" --newer-only && \
                 brew bump-cask-pr "$name" --no-browse --no-fork || true
             done
+          fi
+
+          # Bump formulas
+          if [[ -n "${{ inputs.formula }}" ]]; then
+            brew livecheck --formula "${{ inputs.formula }}" --newer-only && \
+              brew bump-formula-pr "${{ inputs.formula }}" --no-browse --no-fork || true
+          else
+            # Check all formulas in this tap
+            if [[ -d Formula ]]; then
+              for formula in Formula/*.rb; do
+                name=$(basename "$formula" .rb)
+                echo "Checking formula $name..."
+                brew livecheck --formula "$name" --newer-only && \
+                  brew bump-formula-pr "$name" --no-browse --no-fork || true
+              done
+            fi
           fi
