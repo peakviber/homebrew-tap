@@ -12,14 +12,18 @@ jobs:
     steps:
       - uses: Homebrew/actions/setup-homebrew@master
       - uses: actions/checkout@v4
-      - name: Tap repository
+      - name: Set up Homebrew Tap
         run: |
-          REPO_PATH="${PWD}"
-          brew tap ${{ github.repository }} "${REPO_PATH}"
-      - name: Audit casks
+          brew update-reset "$(brew --repository)"
+          TAP_BASE=$(brew --repository)/Library/Taps/${{ github.repository_owner }}
+          mkdir -vp $TAP_BASE
+          ln -vs $GITHUB_WORKSPACE $TAP_BASE/homebrew-${{ github.event.repository.name }}
+      - name: Audit and style check casks
         run: |
           for cask in Casks/*.rb; do
-            brew audit --cask "$(basename "$cask" .rb)"
+            CASK_NAME="$(basename "$cask" .rb)"
+            echo "===> Linting $CASK_NAME"
+            brew style "$CASK_NAME"
+            echo "===> Auditing $CASK_NAME"
+            brew audit --strict --cask "$CASK_NAME"
           done
-      - name: Style check
-        run: brew style Casks/
