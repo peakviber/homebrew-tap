@@ -18,10 +18,10 @@ cask "craft-agents" do
 
   depends_on macos: ">= :monterey"
 
-  app "Craft Agents.app"
+  app "Craft Agent.app"
 
   zap trash: [
-    "~/Library/Application Support/Craft Agents",
-    "~/Library/Preferences/com.lukilabs.craft-agents.plist",
+    "~/Library/Application Support/Craft Agent",
+    "~/Library/Preferences/com.lukilabs.craft-agent.plist",
   ]
 end
