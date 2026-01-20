@@ -12,10 +12,10 @@ jobs:
     steps:
       - uses: Homebrew/actions/setup-homebrew@master
       - uses: actions/checkout@v4
-      - name: Install tap locally
+      - name: Tap repository
         run: |
-          mkdir -p "$(brew --repository)/Library/Taps/${{ github.repository }}"
-          cp -R . "$(brew --repository)/Library/Taps/${{ github.repository }}"
+          REPO_PATH="${PWD}"
+          brew tap ${{ github.repository }} "${REPO_PATH}"
       - name: Audit casks
         run: |
           for cask in Casks/*.rb; do
