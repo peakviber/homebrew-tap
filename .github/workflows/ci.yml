@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+    paths: ["Casks/**", "Formula/**"]
+  push:
+    branches: [main]
+
+jobs:
+  audit:
+    runs-on: macos-latest
+    steps:
+      - uses: Homebrew/actions/setup-homebrew@master
+      - uses: actions/checkout@v4
+      - name: Install tap locally
+        run: |
+          mkdir -p "$(brew --repository)/Library/Taps/${{ github.repository }}"
+          cp -R . "$(brew --repository)/Library/Taps/${{ github.repository }}"
+      - name: Audit casks
+        run: |
+          for cask in Casks/*.rb; do
+            brew audit --cask "$(basename "$cask" .rb)"
+          done
+      - name: Style check
+        run: brew style Casks/

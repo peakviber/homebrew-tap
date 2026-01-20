@@ -1,0 +1,42 @@
+name: Auto-bump Casks
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"  # Every 6 hours
+  workflow_dispatch:
+    inputs:
+      cask:
+        description: "Cask to bump (leave empty for all)"
+        required: false
+
+jobs:
+  bump:
+    runs-on: macos-latest
+    steps:
+      - uses: Homebrew/actions/setup-homebrew@master
+      - uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check for updates and create PRs
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Install tap
+          brew tap ${{ github.repository }}
+
+          if [[ -n "${{ inputs.cask }}" ]]; then
+            brew livecheck --cask "${{ inputs.cask }}" --newer-only && \
+              brew bump-cask-pr "${{ inputs.cask }}" --no-browse --no-fork || true
+          else
+            # Check all casks in this tap
+            for cask in Casks/*.rb; do
+              name=$(basename "$cask" .rb)
+              echo "Checking $name..."
+              brew livecheck --cask "$name" --newer-only && \
+                brew bump-cask-pr "$name" --no-browse --no-fork || true
+            done
+          fi
