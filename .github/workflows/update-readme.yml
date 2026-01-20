@@ -1,0 +1,38 @@
+name: Update README Versions
+
+on:
+  push:
+    branches: [main]
+    paths: ['Casks/*.rb']
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update README versions
+        run: |
+          # Extract version for 1code
+          if [ -f "Casks/1code.rb" ]; then
+            version_1code=$(grep -m1 'version "' Casks/1code.rb | sed 's/.*version "\([^"]*\)".*/\1/')
+            echo "Found 1code version: $version_1code"
+            # Update 1code version in README
+            sed -i "s/\`1code\` | \[\([^]]*\)\]\[1code\]/\`1code\` | [$version_1code][1code]/" README.md
+          fi
+
+          # Extract version for agentastic
+          if [ -f "Casks/agentastic.rb" ]; then
+            version_agentastic=$(grep -m1 'version "' Casks/agentastic.rb | sed 's/.*version "\([^"]*\)".*/\1/')
+            echo "Found agentastic version: $version_agentastic"
+            # Update agentastic version in README
+            sed -i "s/\`agentastic\` | \[\([^]]*\)\]\[agentastic\]/\`agentastic\` | [$version_agentastic][agentastic]/" README.md
+          fi
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --quiet README.md || (git add README.md && git commit -m "Update README versions" && git push)
